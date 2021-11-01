@@ -18,6 +18,8 @@ namespace WhaleExtApi
 {
     public class Startup
     {
+        private readonly string AllowAnyOriginPolicy = "_allowAnyOrigin";
+        
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -28,6 +30,13 @@ namespace WhaleExtApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy(
+                name: AllowAnyOriginPolicy,
+                builder =>
+                    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            });
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -53,6 +62,8 @@ namespace WhaleExtApi
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WhaleExtApi v1"));
             }
+            
+            app.UseCors(AllowAnyOriginPolicy);
 
             app.UseHttpsRedirection();
 
