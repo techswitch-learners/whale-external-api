@@ -19,7 +19,7 @@ namespace WhaleExtApi.Repositories
         Id = 1,
         Date = "2021-10-21",
         LocationId = 1,
-        PhotoUrl = "https://imgur.com/lDfOB6Y",
+        PhotoUrl = "https://i.imgur.com/lDfOB6Y.png",
         Email = "Tim.Leach@softwire.com",
         SpeciesIds = new List<int> {2},
       },
