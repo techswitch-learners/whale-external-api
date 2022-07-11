@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using WhaleExtApi.Database;
 using WhaleExtApi.Repositories;
 using WhaleExtApi.Services;
 
@@ -43,6 +44,8 @@ namespace WhaleExtApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WhaleExtApi", Version = "v1" });
             });
+
+            services.AddTransient<ApiDbContext>();
 
             services.AddTransient<ILocationsRepo, LocationsRepo>();
             services.AddTransient<ISightingsRepo, SightingsRepo>();

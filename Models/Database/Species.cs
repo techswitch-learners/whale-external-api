@@ -10,5 +10,6 @@ namespace WhaleExtApi.Models.Database
     public string PhotoUrl { get; set; }
     public string Description { get; set; }
     public string EndangeredStatus { get; set; }
+    public List<Sighting> Sightings { get; set; }
   }
 }

@@ -1,64 +1,38 @@
 using System.Collections.Generic;
-using System.Linq;
 using WhaleExtApi.Models.Database;
-using WhaleExtApi.Models.Internal;
 using WhaleExtApi.Repositories;
 
 namespace WhaleExtApi.Services
 {
   public interface ISightingsService
   {
-    List<SightingExtended> GetAllSightings();
-    List<SightingExtended> GetAllSightingsByLocationId(int locationId);
-    SightingExtended GetSightingById(int id);
+    IEnumerable<Sighting> GetAllSightings();
+    IEnumerable<Sighting> GetAllSightingsByLocationId(int locationId);
+    Sighting GetSightingById(int id);
   }
 
   public class SightingsService : ISightingsService
   {
-    private readonly ILocationsRepo _locations;
     private readonly ISightingsRepo _sightings;
-    private readonly ISpeciesRepo _species;
 
-    public SightingsService(ILocationsRepo locations, ISightingsRepo sightings, ISpeciesRepo species)
+    public SightingsService(ISightingsRepo sightings)
     {
-      _locations = locations;
       _sightings = sightings;
-      _species = species;
     }
 
-    private SightingExtended ExtendSighting(Sighting sighting)
+    public IEnumerable<Sighting> GetAllSightings()
     {
-      return new SightingExtended {
-          Id = sighting.Id,
-          Date = sighting.Date,
-          PhotoUrl = sighting.PhotoUrl,
-          Email = sighting.Email,
-          Location = _locations.GetLocationById(sighting.LocationId),
-          LocationId = sighting.LocationId,
-          Species = sighting.SpeciesIds.Select(id => _species.GetSpeciesById(id)).ToList(),
-          SpeciesIds = sighting.SpeciesIds,
-      };
+      return _sightings.GetAllSightings();
     }
 
-    public List<SightingExtended> GetAllSightings()
+    public IEnumerable<Sighting> GetAllSightingsByLocationId(int locationId)
     {
-      return _sightings
-        .GetAllSightings()
-        .Select(ExtendSighting)
-        .ToList();
+      return _sightings.GetAllSightingsByLocationId(locationId);
     }
 
-    public List<SightingExtended> GetAllSightingsByLocationId(int locationId)
+    public Sighting GetSightingById(int id)
     {
-      return _sightings
-        .GetAllSightingsByLocationId(locationId)
-        .Select(ExtendSighting)
-        .ToList();
-    }
-
-    public SightingExtended GetSightingById(int id)
-    {
-      return ExtendSighting(_sightings.GetSightingById(id));
+      return _sightings.GetSightingById(id);
     }
   }
 }
