@@ -1,64 +1,44 @@
 using System.Collections.Generic;
-using System.Linq;
 using WhaleExtApi.Models.Database;
-using WhaleExtApi.Models.Internal;
 using WhaleExtApi.Repositories;
 
 namespace WhaleExtApi.Services
 {
   public interface ISpeciesService
   {
-    List<SpeciesExtended> GetAllSpecies();
-    SpeciesExtended GetSpeciesById(int id);
-    SpeciesExtended GetSpeciesByName(string name);
-    SpeciesExtended GetSpeciesByLatinName(string latinName);
+    IEnumerable<Species> GetAllSpecies();
+    Species GetSpeciesById(int id);
+    Species GetSpeciesByName(string name);
+    Species GetSpeciesByLatinName(string latinName);
   }
 
   public class SpeciesService : ISpeciesService
   {
-    private readonly ISightingsRepo _sightings;
     private readonly ISpeciesRepo _species;
 
-    public SpeciesService(ISightingsRepo sightings, ISpeciesRepo species)
+    public SpeciesService(ISpeciesRepo species)
     {
-      _sightings = sightings;
       _species = species;
     }
 
-    private SpeciesExtended ExtendSpecies(Species species)
+    public IEnumerable<Species> GetAllSpecies()
     {
-      return new SpeciesExtended {
-        Id = species.Id,
-        Name = species.Name,
-        LatinName = species.LatinName,
-        PhotoUrl = species.PhotoUrl,
-        Description = species.Description,
-        EndangeredStatus = species.EndangeredStatus,
-        Sightings = _sightings.GetAllSightingsBySpeciesId(species.Id).ToList(),
-      };
+      return _species.GetAllSpecies();
     }
 
-    public List<SpeciesExtended> GetAllSpecies()
+    public Species GetSpeciesById(int id)
     {
-      return _species
-        .GetAllSpecies()
-        .Select(ExtendSpecies)
-        .ToList();
+      return _species.GetSpeciesById(id);
     }
 
-    public SpeciesExtended GetSpeciesById(int id)
+    public Species GetSpeciesByName(string name)
     {
-      return ExtendSpecies(_species.GetSpeciesById(id));
+      return _species.GetSpeciesByName(name);
     }
 
-    public SpeciesExtended GetSpeciesByName(string name)
+    public Species GetSpeciesByLatinName(string latinName)
     {
-      return ExtendSpecies(_species.GetSpeciesByName(name));
-    }
-
-    public SpeciesExtended GetSpeciesByLatinName(string latinName)
-    {
-      return ExtendSpecies(_species.GetSpeciesByLatinName(latinName));
+      return _species.GetSpeciesByLatinName(latinName);
     }
   }
 }

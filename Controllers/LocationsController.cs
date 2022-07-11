@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using WhaleExtApi.Models.Internal;
 using WhaleExtApi.Models.Response;
 using WhaleExtApi.Services;
 
@@ -19,19 +18,17 @@ namespace WhaleExtApi.Controllers
     [HttpGet]
     public ActionResult<LocationListResponse> GetAllLocations()
     {
-      return new LocationListResponse {
-        Locations = _locationService.GetAllLocations(),
-      };
+      return new LocationListResponse(_locationService.GetAllLocations());
     }
 
     [HttpGet("{id}")]
-    public ActionResult<LocationExtended> GetLocationById([FromRoute] int id)
+    public ActionResult<LocationResponse> GetLocationById([FromRoute] int id)
     {
-      return _locationService.GetLocationById(id);
+      return new LocationResponse(_locationService.GetLocationById(id));
     }
 
     [HttpGet("search")]
-    public ActionResult<LocationExtended> GetClosestLocation(
+    public ActionResult<LocationResponse> GetClosestLocation(
       [FromQuery] double latitude,
       [FromQuery] double longitude
     )

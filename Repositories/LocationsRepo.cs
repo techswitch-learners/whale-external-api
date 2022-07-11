@@ -2,58 +2,41 @@ using System.Linq;
 using System.Collections.Generic;
 using WhaleExtApi.Models.Database;
 using System;
+using WhaleExtApi.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace WhaleExtApi.Repositories
 {
   public interface ILocationsRepo
   {
-    List<Location> GetAllLocations();
+    IEnumerable<Location> GetAllLocations();
     Location GetLocationById(int id);
     Location GetClosestLocation(double latitude, double longitude);
   }
 
   public class LocationsRepo : ILocationsRepo
   {
-    private readonly List<Location> _locations = new List<Location> {
-      new Location {
-        Id = 1,
-        Latitude = 52.205278,
-        Longitude = 0.119167,
-        Name = "Cambridge",
-        Description = "An unlikely spot for seeing whales, the river Cam plays host to a veritable menagerie of cetacea throughout the year.",
-      },
-      new Location {
-        Id = 2,
-        Latitude = 27.988056,
-        Longitude = 86.925278,
-        Name = "Mount Everest",
-        Description = "One of the remotest places on the planet is actually visited regularly by a pod of baleen whales - at least according to those few who have made it to the top!",
-      },
-      new Location {
-        Id = 3,
-        Latitude = 46.283333,
-        Longitude = 86.666667,
-        Name = "Eurasian Pole of Inaccessibility (Xinjiang, China)",
-        Description = "The EPIA, in China's Xinjiang region, is the point on earth furthest from the ocean, which makes it extra interesting that a family of blue whales (Earth's largest animal) has settled here!",
-      },
-      new Location {
-        Id = 4,
-        Latitude = 90, 
-        Longitude = 0,
-        Name = "The North Pole",
-        Description = "Santa recently enlisted the help of nearly 5000 dolphins to help him with the toy packaging. Their flippers are surprisingly dextrous!",
-      }
-    };
+    private readonly ApiDbContext _context;
 
-    public List<Location> GetAllLocations()
+    public LocationsRepo(ApiDbContext context)
     {
-      return _locations;
+      _context = context;
+    }
+
+    public IEnumerable<Location> GetAllLocations()
+    {
+      return _context
+        .Locations
+        .Include(l => l.Sightings)
+        .ThenInclude(s => s.Species);
     }
     public Location GetLocationById(int id)
     {
-      return _locations
-        .Where(s => s.Id == id)
-        .Single();
+      return _context
+        .Locations
+        .Include(l => l.Sightings)
+        .ThenInclude(s => s.Species)
+        .Single(s => s.Id == id);
     }
     public Location GetClosestLocation(double latitude, double longitude)
     {

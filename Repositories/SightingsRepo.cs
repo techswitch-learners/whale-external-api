@@ -1,54 +1,61 @@
 using System.Linq;
 using System.Collections.Generic;
 using WhaleExtApi.Models.Database;
+using WhaleExtApi.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace WhaleExtApi.Repositories
 {
   public interface ISightingsRepo
   {
-    List<Sighting> GetAllSightings();
-    List<Sighting> GetAllSightingsByLocationId(int locationId);
-    List<Sighting> GetAllSightingsBySpeciesId(int speciesId);
+    IEnumerable<Sighting> GetAllSightings();
+    IEnumerable<Sighting> GetAllSightingsByLocationId(int locationId);
+    IEnumerable<Sighting> GetAllSightingsBySpeciesId(int speciesId);
     Sighting GetSightingById(int id);
   }
 
   public class SightingsRepo : ISightingsRepo
   {
-    private readonly List<Sighting> _sightings = new List<Sighting> {
-      new Sighting {
-        Id = 1,
-        Date = "2021-10-21",
-        LocationId = 1,
-        PhotoUrl = "https://i.imgur.com/lDfOB6Y.png",
-        Email = "Tim.Leach@softwire.com",
-        SpeciesIds = new List<int> {2},
-      },
-    };
+    private readonly ApiDbContext _context;
 
-    public List<Sighting> GetAllSightings()
+    public SightingsRepo(ApiDbContext context)
     {
-      return _sightings;
+      _context = context;
     }
 
-    public List<Sighting> GetAllSightingsByLocationId(int locationId)
+    public IEnumerable<Sighting> GetAllSightings()
     {
-      return _sightings
-        .Where(s => s.LocationId == locationId)
-        .ToList();
+      return _context
+        .Sightings
+        .Include(s => s.Species)
+        .Include(s => s.Location);
     }
 
-    public List<Sighting> GetAllSightingsBySpeciesId(int speciesId)
+    public IEnumerable<Sighting> GetAllSightingsByLocationId(int locationId)
     {
-      return _sightings
-        .Where(s => s.SpeciesIds.Contains(speciesId))
-        .ToList();
+      return _context
+        .Sightings
+        .Include(s => s.Species)
+        .Include(s => s.Location)
+        .Where(s => s.Location.Id == locationId);
+    }
+
+    public IEnumerable<Sighting> GetAllSightingsBySpeciesId(int speciesId)
+    {
+      return _context
+        .Sightings
+        .Include(s => s.Species)
+        .Include(s => s.Location)
+        .Where(s => s.Species.Any(sp => sp.Id == speciesId));
     }
 
     public Sighting GetSightingById(int id)
     {
-      return _sightings
-        .Where(s => s.Id == id)
-        .Single();
+      return _context
+        .Sightings
+        .Include(s => s.Species)
+        .Include(s => s.Location)
+        .Single(s => s.Id == id);
     }
   }
 }

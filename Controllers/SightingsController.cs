@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using WhaleExtApi.Models.Internal;
 using WhaleExtApi.Models.Response;
 using WhaleExtApi.Services;
 
@@ -19,15 +18,13 @@ namespace WhaleExtApi.Controllers
     [HttpGet]
     public ActionResult<SightingListResponse> GetAllSightings()
     {
-      return new SightingListResponse {
-        Sightings = _sightingsService.GetAllSightings(),
-      };
+      return new SightingListResponse(_sightingsService.GetAllSightings());
     }
 
     [HttpGet("{id}")]
-    public ActionResult<SightingExtended> GetSightingById([FromRoute] int id)
+    public ActionResult<SightingResponse> GetSightingById([FromRoute] int id)
     {
-      return _sightingsService.GetSightingById(id);
+      return new SightingResponse(_sightingsService.GetSightingById(id));
     }
   }
 }
